@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Laravel 10 project with Docker, Nginx, MySQL, and PHP 8.2 on Mac M1
+## Laravel 10 project with Docker, Nginx, MySQL, and PHP 8.2
 Hi, now we're going to create a new project with the following steps: 
 
 ### Install Docker Desktop for Mac M1:
@@ -180,7 +180,7 @@ DB_PASSWORD=
 That's it! You have successfully created a Laravel 10 project with Docker, Nginx, MySQL, and PHP 8.2 on your Mac M1.
 
 
-### Change port
+### Change http port
 
 If you want to open another port for your Laravel project, you can modify the docker-compose.yml file to expose an additional port. Here's how you can do it:
 1. Open the docker-compose.yml file in your preferred text editor.
@@ -218,3 +218,74 @@ docker-compose up -d
 
 Now you should be able to access your Laravel application on both ports 8080 and 8000. 
 For example, you can visit http://localhost:8000 in your web browser to access the application on the new port.
+
+### change mysql port
+
+If you want to open another port for your mysql server, you can modify the docker-compose.yml file to expose an additional port. Here's how you can do it: or change 3306:3306 to 3307:3306
+
+```yml 
+    ports:
+      - 3307:3306 
+```
+
+also you if you your root password is empty, you can change the password like this:
+
+```yml 
+    environment:
+        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+        - MYSQL_DATABASE=si_app
+```
+so your complete yml file is :
+
+```yml
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+    image: laravel-app
+    container_name: laravel-app
+    restart: unless-stopped
+    tty: true
+    environment:
+      - APP_NAME=Laravel
+      - APP_ENV=local
+      - APP_KEY=
+      - APP_DEBUG=true
+      - APP_URL=http://localhost
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+    volumes:
+      - .:/var/www/html
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    networks:
+      - laravel
+
+  db:
+    image: mysql:latest
+    container_name: laravel-db
+    restart: unless-stopped
+    tty: true
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=laravel
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - 3307:3306
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
+```
+
