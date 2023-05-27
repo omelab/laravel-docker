@@ -288,4 +288,15 @@ networks:
   laravel:
     driver: bridge
 ```
+- Run the following command to restart the Docker containers:
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+- Generate databse migration:
+
+```bash
+docker-compose exec app php artisan migrate
+```
 
